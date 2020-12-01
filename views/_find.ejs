@@ -1,0 +1,47 @@
+<div class="form-group row">
+    <label class="col-form-label col-sm-2" for="ID">ID</label>
+    <div class="col-sm-3">
+      <input type= "number" autofocus class="form-control" name="ID" value="<%= model.ID %>" />
+    </div>
+    (equals)
+  </div>
+  
+  <div class="form-group row">
+    <label class="col-form-label col-sm-2" for="First">First Name</label>
+    <div class="col-sm-3">
+      <input class="form-control" name="First" value="<%= model.First %>"/>
+    </div>
+    (begins with)
+  </div>
+  
+  <div class="form-group row">
+    <label class="col-form-label col-sm-2" for="Last">Last Name</label>
+    <div class="col-sm-3">
+      <input class="form-control" cols="20" name="Last" maxlength="32000" rows="7" value ="<%= model.Last %>" />
+    </div>
+    (begins with)
+  </div>
+
+  <div class="form-group row">
+    <label class="col-form-label col-sm-2" for="State">State</label>
+    <div class="col-sm-3">
+      <input class="form-control" cols="20" name="State" maxlength="2" rows="7" value ="<%= model.State %>" />
+    </div>
+    (begins with)
+  </div>
+
+  <div class="form-group row">
+    <label class="col-form-label col-sm-2" for="YTD">Sales YTD</label>
+    <div class="col-sm-3">
+      <input type="number" class="form-control" cols="20" name="YTD" maxlength="32000" rows="7" value ="<%= model.YTD %>" />
+    </div>
+    (greater than or equal to)
+  </div>
+
+  <div class="form-group row">
+    <label class="col-form-label col-sm-2" for="Previous">Previous Years Sales</label>
+    <div class="col-sm-3">
+      <input type="number" class="form-control" cols="20" name="Previous" maxlength="32000" rows="7" value ="<%= model.Previous %>" />
+    </div>
+    (greater than or equal to)
+  </div>

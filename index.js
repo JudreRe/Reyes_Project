@@ -20,3 +20,8 @@ app.listen(3000, () => { {
 app.get("/", (req, res) => { {
     res.render("index");
   }});
+
+
+app.get("/manage",(req, res) => { {
+    res.render("manage", { model: {}});
+}})
