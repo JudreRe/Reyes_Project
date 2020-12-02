@@ -24,4 +24,10 @@ app.get("/", (req, res) => { {
 
 app.get("/manage",(req, res) => { {
     res.render("manage", { model: {}});
-}})
+}});
+
+
+app.get("/export", (req, res) => {
+  var message = "";
+  res.render("export",{ message: message });
+ });
