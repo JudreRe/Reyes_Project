@@ -1,47 +1,87 @@
-<div class="form-group row">
-    <label class="col-form-label col-sm-2" for="ID">ID</label>
-    <div class="col-sm-3">
-      <input type= "number" autofocus class="form-control" name="ID" value="<%= model.ID %>" />
-    </div>
-    (equals)
-  </div>
+<h4>Total number of records in the database: <%= totRecs %></h4>
+
+
+<form action="/search" method="POST">
+    <table>
+        <tr>
+            <td><label   >ID</label></td>
+            <td><input autofocus class="form-control" type="number" name="cusid" id="cusid" value="<%= customer.cusid %>" /></td>
+            <td>(equal)</td>
+        </tr>
+        <tr>
+            <td><label for="cusfname">First Name</label></td>
+            <td><input autofocus class="form-control" type="text" name="cusfname" id="cusfname" value="<%= customer.cusfname %>" /></td>
+            <td>(begins with)</td>
+        </tr>
+        <tr>
+            <td><label for="cuslname">Last Name</label></td>
+            <td><input autofocus class="form-control" type="text" name="cuslname" id="cuslname" value="<%= customer.cuslname %>" /></td>
+            <td>(begins with)</td>
+        </tr>
+        <tr>
+            <td><label for="cusstate">State</label></td>
+            <td><input autofocus class="form-control" type="text" name="cusstate" id="cusstate" maxlength = "2" value="<%= customer.cusstate %>" /></td>
+            <td>(equals)</td>
+        </tr>
+        <tr>
+          <td><label for="cussalesytd">Sales YTD</label></td>
+          <td><input autofocus class="form-control" type="number" name="cussalesytd" id="cussalesytd" value="<%= customer.cussalesytd %>" /></td>
+          <td>(greater than or equal to)</td>
+      </tr>
+      <tr>
+        <td><label for="cussalesprev">Previous Years Sales</label></td>
+        <td><input autofocus class="form-control" type="number" name="cussalesprev" id="cussalesprev" value="<%= customer.cussalesprev %>" /></td>
+        <td>(greater than or equal to)</td>
+    </tr>
+    </table>
+    <div class="form-group row">
+        <label class="col-form-label col-sm-2"></label>
+        <div class="col-sm-10">
+          <input type="submit" value="Find" class="btn btn-default btn-info" />
+          <a class="btn btn-danger cancel" href="/manage">Reset</a>
+        </div>
+</form>
+
+
+<% if (type === "post") { %>
+  <% if (result.result.length === 0) { %>
+      <h3>No records found!</h3>
+  <% } else { %>
+    <h4>Number of Records Found: <%= totRecs %></h4>
+      <table>
+        <table class="table table-hover">
+          <thead>
+              <tr>
+                  <th>ID</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>State</th>
+                  <th>Sales YTD</th>
+                  <th>Prev Years Sales</th>
+                  <th class="d-print-none">
+                    <a class="btn btn-sm btn-success" href="/create">Create Customer</a>
+                  </th>
+              </tr>
+          </thead>
+          <tbody>
+              <% result.result.forEach(customer => { %> 
+                  <tr>
+                      <td><%= customer.cusid %></td>
+                      <td><%= customer.cusfname %></td>
+                      <td><%= customer.cuslname %></td>
+                      <td><%= customer.cusstate %></td>
+                      <td><%= customer.cussalesytd %></td>
+                      <td><%= customer.cussalesprev %></td>
+                      <td class="d-print-none">
+                        <a class="btn btn-sm btn-warning" href="/edit/<%= customer.cusid %>">Edit</a>
+                        <a class="btn btn-sm btn-danger" href="/delete/<%= customer.cusid %>">Delete</a>
+                      </td>
+                  </tr>
+              <% }); %>
+          </tbody>
+
+      </table>
+  <% } %>
+<% } %>
+
   
-  <div class="form-group row">
-    <label class="col-form-label col-sm-2" for="First">First Name</label>
-    <div class="col-sm-3">
-      <input class="form-control" name="First" value="<%= model.First %>"/>
-    </div>
-    (begins with)
-  </div>
-  
-  <div class="form-group row">
-    <label class="col-form-label col-sm-2" for="Last">Last Name</label>
-    <div class="col-sm-3">
-      <input class="form-control" cols="20" name="Last" maxlength="32000" rows="7" value ="<%= model.Last %>" />
-    </div>
-    (begins with)
-  </div>
-
-  <div class="form-group row">
-    <label class="col-form-label col-sm-2" for="State">State</label>
-    <div class="col-sm-3">
-      <input class="form-control" cols="20" name="State" maxlength="2" rows="7" value ="<%= model.State %>" />
-    </div>
-    (begins with)
-  </div>
-
-  <div class="form-group row">
-    <label class="col-form-label col-sm-2" for="YTD">Sales YTD</label>
-    <div class="col-sm-3">
-      <input type="number" class="form-control" cols="20" name="YTD" maxlength="32000" rows="7" value ="<%= model.YTD %>" />
-    </div>
-    (greater than or equal to)
-  </div>
-
-  <div class="form-group row">
-    <label class="col-form-label col-sm-2" for="Previous">Previous Years Sales</label>
-    <div class="col-sm-3">
-      <input type="number" class="form-control" cols="20" name="Previous" maxlength="32000" rows="7" value ="<%= model.Previous %>" />
-    </div>
-    (greater than or equal to)
-  </div>

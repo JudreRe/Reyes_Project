@@ -1,11 +1,12 @@
 <%- include("_header") -%>
 <div>
+    Total number of records in the database: <%= totRecs %><br>
     Enter a file name and click "Export Customers" 
 </div>
 <form action="/export" method="post">
     File Name
     <input type="text" id= "name" value="export.txt">
-    <input type="submit" id="submit" value="Export Customers">
+    <input class="btn btn-info" type="submit" id="submit" value="Export Customers">
 </form>
 
 <% if(message.substring(0,5) === "Error") { %>
