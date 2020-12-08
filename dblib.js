@@ -110,6 +110,8 @@ const findCustomer = (customer) => {
         });
 };
 
+
+
 module.exports.findCustomer = findCustomer;
 module.exports.insertCustomer = insertCustomer;
 module.exports.getTotalRecords = getTotalRecords;

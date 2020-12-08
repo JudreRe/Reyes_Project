@@ -143,6 +143,7 @@ app.post("/edit/:id", (req, res) => {
 app.get("/delete/:id", (req,res) =>{
   const id = req.params.id;
   const sql = "SELECT * FROM customer WHERE cusid =$1";
+  
   pool.query(sql, [id], (err, result) => {
     if(err){
       return console.error(err.message);
@@ -161,7 +162,7 @@ app.post("/delete/:id", (req, res) => {
       return console.error(err.message);
     }
     console.log(result.rows[0]);
-    res.render("index");
+    res.render("delete", {model:result.rows[0] });
   });
 });
 
@@ -232,7 +233,7 @@ app.get("/import", async (req, res) => {
 });
 
 // POST /import
-app.post("/import", async (req, res) => {
+app.post("/import", (req, res) => {
    if(!req.files || Object.keys(req.files).length === 0) {
        message = "Error: Import file not uploaded";
        return res.send(message);
