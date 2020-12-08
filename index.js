@@ -80,7 +80,7 @@ app.post("/manage", async (req, res) => {
               totRecs: totRecs.totRecords,
               result: result,
               customer: req.body
-          })
+          });
       })
       .catch(err => {
           res.render("manage", {
@@ -233,14 +233,13 @@ app.get("/import", async (req, res) => {
 });
 
 // POST /import
-app.post("/import", (req, res) => {
+app.post("/import", upload.single('filename'), (req, res) => {
    if(!req.files || Object.keys(req.files).length === 0) {
        message = "Error: Import file not uploaded";
        return res.send(message);
    };
    //Read file line by line, inserting records
-   const fn = req.files.filename;
-   const buffer = fn.data;
+   const buffer = req.file.buffer;
    const lines = buffer.toString().split(/\r?\n/);
 
    lines.forEach(line => {

@@ -2,7 +2,7 @@
 <h2>Customer Import</h2>
 
 <div style="padding-top: 10px;">Total number of records in the database: <%= totRecs %> <br></div>
-<div style="padding-top: 10px;">Select a file with products for Database Insert</div> 
+<div style="padding-top: 10px;">Select a file with Customers for Database Insert</div> 
 <form style="padding-top: 10px;">
     <input type="file" name="filename" required><p></p>
     <input class="btn btn-info" type="submit" value="Import Customers" required>
@@ -25,7 +25,7 @@
         .then(response => response.text())
         .then(data => {
             const resultElement = document.getElementById("result");
-            if (data.substring(0,5) === "Error") {
+            if (data.substring(0,6) === "Error") {
                 resultElement.innerText = `Error occurred!  ${data}`
             } else {
                 resultElement.innerText = data;
