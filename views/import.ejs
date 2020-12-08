@@ -1,10 +1,13 @@
 <%- include("_header") -%>
-Total number of records in the database: <%= totRecs %> <br>
-Select a file with products for Database Insert
-<form>
+<h2>Customer Import</h2>
+
+<div style="padding-top: 10px;">Total number of records in the database: <%= totRecs %> <br></div>
+<div style="padding-top: 10px;">Select a file with products for Database Insert</div> 
+<form style="padding-top: 10px;">
     <input type="file" name="filename" required><p></p>
-    <input class="btn btn-info" type="submit" value="Import Customers">
+    <input class="btn btn-info" type="submit" value="Import Customers" required>
 </form>
+
 <p id="result"></p>
 
 <script>
@@ -15,7 +18,7 @@ Select a file with products for Database Insert
       
       const formData = new FormData(e.target);
       
-      fetch("/input", {
+      fetch("/import", {
         method: "POST",
         body: formData
       })

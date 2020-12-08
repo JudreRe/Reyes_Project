@@ -1,0 +1,17 @@
+<%- include("_header") -%>
+
+<h1>Report</h1>
+
+
+<form action="/reports" method="post">
+  <div class="form-horizontal">
+
+    <%- include("_reporting") -%>
+    
+</form>
+
+<form style="padding-top: 20px;">
+  <input class="btn btn-info" type="submit" value="Run Report">
+</form>
+
+<%- include("_footer") -%>

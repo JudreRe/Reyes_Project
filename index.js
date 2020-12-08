@@ -4,7 +4,16 @@ const dblib = require("./dblib.js");
 const path = require("path");
 const multer = require("multer");
 const upload = multer();
+const { Pool } = require('pg');
 
+const pool = new Pool({
+ connectionString: process.env.DATABASE_URL,
+ ssl: {
+   rejectUnauthorized: false
+ }
+});
+
+require('dotenv').config()
 
 
 app.set("view engine", "ejs");
@@ -54,11 +63,15 @@ app.get("/manage", async (req, res) => {
       totRecs: totRecs.totRecords,
       customer: customers
   });
+
+  
+
 });
 
 app.post("/manage", async (req, res) => {
 
   const totRecs = await dblib.getTotalRecords();
+  
 
   dblib.findCustomer(req.body)
       .then(result => {
@@ -122,7 +135,7 @@ app.post("/edit/:id", (req, res) => {
     if (err) {
       return console.error(err.message);
     }
-    res.render("/edit");
+    res.render("index");
   });
 });
 
@@ -135,7 +148,7 @@ app.get("/delete/:id", (req,res) =>{
       return console.error(err.message);
     }
     console.log(result.rows[0]);
-    res.render("delete", { model: result.row[0] });
+    res.render("delete", { model: result.rows[0] });
   });
 });
 
@@ -147,9 +160,57 @@ app.post("/delete/:id", (req, res) => {
     if (err){
       return console.error(err.message);
     }
-    res.redirect("/delete");
+    console.log(result.rows[0]);
+    res.render("index");
   });
 });
+
+
+//Get /report
+app.get("/reports", async (req, res) => {
+  const totRecs = await dblib.getTotalRecords();
+  
+  const customers = {
+      cusid: "",
+      cusfname: "",
+      cuslname: "",
+      cusstate: "",
+      cussalesytd: "",
+      cussalesprev: ""
+  };
+
+  res.render("reports", {
+      type: "get",
+      totRecs: totRecs.totRecords,
+      customer: customers
+  });
+});
+
+//POST /report
+app.post("/reports", async (req, res) => {
+
+  const totRecs = await dblib.getTotalRecords();
+
+  dblib.findCustomer(req.body)
+      .then(result => {
+          res.render("reports", {
+              type: "post",
+              totRecs: totRecs.totRecords,
+              result: result,
+              customer: req.body
+          })
+      })
+      .catch(err => {
+          res.render("reports", {
+              type: "post",
+              totRecs: totRecs.totRecords,
+              result: `Unexpected Error: ${err.message}`,
+              customer: req.body
+          });
+      });
+
+});
+
 // GET /import
 app.get("/import", async (req, res) => {
   const totRecs = await dblib.getTotalRecords();
@@ -180,25 +241,6 @@ app.post("/import", async (req, res) => {
    const fn = req.files.filename;
    const buffer = fn.data;
    const lines = buffer.toString().split(/\r?\n/);
-   const totRecs = await dblib.getTotalRecords();
-
-  dblib.findCustomer(req.body)
-      .then(result => {
-          res.render("manage", {
-              type: "post",
-              totRecs: totRecs.totRecords,
-              result: result,
-              customer: req.body
-          })
-      })
-      .catch(err => {
-          res.render("manage", {
-              type: "post",
-              totRecs: totRecs.totRecords,
-              result: `Unexpected Error: ${err.message}`,
-              customer: req.body
-          });
-      });
 
    lines.forEach(line => {
         //console.log(line);
@@ -245,37 +287,18 @@ app.get("/export", async (req, res) => {
  // POST /export
  app.post("/export", async (req, res) => {
      const sql = "SELECT * FROM customer ORDER BY cusid";
-     const totRecs = await dblib.getTotalRecords();
-
-  dblib.findCustomer(req.body)
-      .then(result => {
-          res.render("manage", {
-              type: "post",
-              totRecs: totRecs.totRecords,
-              result: result,
-              customer: req.body
-          })
-      })
-      .catch(err => {
-          res.render("manage", {
-              type: "post",
-              totRecs: totRecs.totRecords,
-              result: `Unexpected Error: ${err.message}`,
-              customer: req.body
-          });
-      });
      pool.query(sql, [], (err, result) => {
          var message = "";
          if(err) {
              message = `Error - ${err.message}`;
-             res.render("export", { message: message })
+             res.render("output", { message: message })
          } else {
              var output = "";
              result.rows.forEach(customer => {
                  output += `${customer.cusid},${customer.cusfname},${customer.cuslname},${customer.cusstate},${customer.cussalesytd},${customer.cussalesprev}\r\n`;
              });
              res.header("Content-Type", "text/csv");
-             res.attachment("export.csv");
+             res.attachment("export.txt");
              return res.send(output);
          };
          
@@ -283,13 +306,5 @@ app.get("/export", async (req, res) => {
  });
 
 
- const { Pool } = require('pg');
- const pool = new Pool({
-  connectionString: process.env.DATABASE_URL="postgres://dyoqbufukkqsjd:3f53356884bc479f24a7843a9cf3cc3c53aef18b082780343f27c415a2d68f8d@ec2-3-216-89-250.compute-1.amazonaws.com:5432/d6vbpgroor95kg",
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
 
-require('dotenv').config()
 

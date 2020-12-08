@@ -1,11 +1,17 @@
 <%- include("_header") -%>
-<div>
+<h2>Customer Export</h2>
+<div style="padding-top: 10px;">
     Total number of records in the database: <%= totRecs %><br>
-    Enter a file name and click "Export Customers" 
 </div>
-<form action="/export" method="post">
+<div style="padding-top: 10px;">
+    Enter a file name and click "Export Customers"
+</div>
+<form  style= "padding-right: 50px;" action="/export" method="post">
     File Name
-    <input type="text" id= "name" value="export.txt">
+    <input type="text" id= "name" value="export.txt"><br>
+</form>
+
+<form  style= "padding-top: 20px;" action="/export" method="post">
     <input class="btn btn-info" type="submit" id="submit" value="Export Customers">
 </form>
 
