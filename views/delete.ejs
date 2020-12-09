@@ -16,4 +16,12 @@
   </div>
 </form>
 
+<% if(type === "POST") { %>
+  <% if (resultDel === 1) { %>
+    <h3>Customer Successfully Deleted!</h3>
+  <% } else { %>
+      <h3>Error! </h3>
+      <p><%= resultDel %></p>
+  <% } %>
+<% } %>
 <%- include("_footer") -%>

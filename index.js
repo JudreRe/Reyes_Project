@@ -149,22 +149,37 @@ app.get("/delete/:id", (req,res) =>{
       return console.error(err.message);
     }
     console.log(result.rows[0]);
-    res.render("delete", { model: result.rows[0] });
+    res.render("delete", { model: result.rows[0],
+    type: "get" });
   });
 });
 
 //POST /delete
-app.post("/delete/:id", (req, res) => {
+app.post("/delete/:id", async (req, res) => {
   const id = req.params.id;
+  const model = req.body; 
+  console.log("the model is", model);
   const sql = "DELETE FROM customer WHERE cusid = $1";
-  pool.query(sql, [id], (err, result) => {
-    if (err){
-      return console.error(err.message);
-    }
-    console.log(result.rows[0]);
-    res.render("delete", {model:result.rows[0] });
+  try {   
+    const resultDel = await pool.query(sql,[id]);
+
+        res.render("delete", {
+          model:model,
+          resultDel: resultDel.rowCount,
+        type: "POST" });
+  
+      } catch (err) {
+        res.render("delete", {
+          model:model,
+          resultDel: err.message,
+        type: "POST" });
+        console.log(err.message);
+      }
+
+
+
   });
-});
+
 
 
 //Get /report
@@ -215,14 +230,15 @@ app.post("/reports", async (req, res) => {
 // GET /import
 app.get("/import", async (req, res) => {
   const totRecs = await dblib.getTotalRecords();
-  
   const customers = {
+
       cusid: "",
       cusfname: "",
       cuslname: "",
       cusstate: "",
       cussalesytd: "",
       cussalesprev: ""
+      
   };
 
   res.render("import", {
@@ -234,17 +250,17 @@ app.get("/import", async (req, res) => {
 
 // POST /import
 app.post("/import", upload.single('filename'), (req, res) => {
-   if(!req.files || Object.keys(req.files).length === 0) {
+   if(!req.file || Object.keys(req.file).length === 0) {
        message = "Error: Import file not uploaded";
        return res.send(message);
    };
    //Read file line by line, inserting records
    const buffer = req.file.buffer;
    const lines = buffer.toString().split(/\r?\n/);
-
+   
    lines.forEach(line => {
         //console.log(line);
-        product = line.split(",");
+        customer = line.split(",");
         //console.log(customer);
         const sql = "INSERT INTO customer(cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
         pool.query(sql, customer, (err, result) => {
