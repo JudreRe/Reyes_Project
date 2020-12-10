@@ -10,42 +10,7 @@
     
 </form>
 
-<form style="padding-top: 20px;">
-  <input class="btn btn-info" type="submit" value="Run Report">
-</form>
 
-<% if (type === "post") { %>
-  <% if (result.result.length === 0) { %>
-      <h3>No records found!</h3>
-  <% } else { %>
-      <table>
-        <table class="table table-hover">
-          <thead>
-              <tr>
-                  <th>ID</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>State</th>
-                  <th>Sales YTD</th>
-                  <th>Prev Years Sales</th>
-              </tr>
-          </thead>
-          <tbody>
-              <% result.result.forEach(customer => { %> 
-                  <tr>
-                      <td><%= customer.cusid %></td>
-                      <td><%= customer.cusfname %></td>
-                      <td><%= customer.cuslname %></td>
-                      <td><%= customer.cusstate %></td>
-                      <td><%= customer.cussalesytd %></td>
-                      <td><%= customer.cussalesprev %></td>
-                  </tr>
-              <% }); %>
-          </tbody>
-
-      </table>
-  <% } %>
-<% } %>
 
 
 <%- include("_footer") -%>
