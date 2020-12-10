@@ -10,11 +10,21 @@
     <div class="form-group row">
       <label class="col-form-label col-sm-2"></label>
       <div class="col-sm-10">
-        <input type="submit" value="Update Customer" class="btn btn-default btn-warning" />
+        <input  type="submit" value="Update Customer" class="btn btn-default btn-warning" />
       </div>
     </div>
   </div>
 </form>
+
+<% if(type === "POST") { %>
+  <% if (resultEdit === 1) { %>
+    <h3>Customer Successfully Updated!</h3>
+  <% } else { %>
+      <h3>Error! </h3>
+      <p><%= resultEdit %></p>
+  <% } %>
+<% } %>
+
 
 
 <%- include("_footer") -%>

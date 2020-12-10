@@ -50,6 +50,15 @@ const insertCustomer = (customer) => {
         });
 };
 
+// const reportCustomer = (customer) => {
+
+//     var i = 1;
+//     params = [];
+//     sql = "SELECT * FROM customer WHERE true";
+
+//     if ()
+// }
+
 
 const findCustomer = (customer) => {
     

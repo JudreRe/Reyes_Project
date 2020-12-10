@@ -17,4 +17,15 @@
   </div>
 </form>
 
+<% if(type === "POST") { %>
+  <% if (resultNew === 1) { %>
+    <h3>Customer Successfully Created!</h3>
+  <% } else { %>
+      <h3>Error! </h3>
+      <p><%= resultNew %></p>
+  <% } %>
+<% } %>
+
+
+
 <%- include("_footer") -%>
