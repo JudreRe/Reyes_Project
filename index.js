@@ -30,12 +30,15 @@ app.use((req, res, next) => {
   next();
 });
 
-app.listen(3000, () => {
-  {
-    console.log("Server started (http://localhost:3000/) !");
-  }
-});
+// app.listen(3000, () => {
+//   {
+//     console.log("Server started (http://localhost:3000/) !");
+//   }
+// });
 
+app.listen(process.env.PORT || 3000, function(){
+  console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
+});
 
 //Test to make sure the application works
 //Home
