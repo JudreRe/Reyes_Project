@@ -39,7 +39,7 @@ const insertCustomer = (customer) => {
         .then(res => {
             return {
                 trans: "success", 
-                msg: `car id ${params[0]} successfully inserted`
+                msg: `cus id ${params[0]} successfully inserted`
             };
         })
         .catch(err => {
@@ -50,14 +50,27 @@ const insertCustomer = (customer) => {
         });
 };
 
-// const reportCustomer = (customer) => {
+const reportCustomer = () => {
 
-//     var i = 1;
-//     params = [];
-//     sql = "SELECT * FROM customer WHERE true";
+ 
+    const sql = "SELECT * FROM customer ORDER BY cuslname asc";
 
-//     if ()
-// }
+    return pool.query(sql)
+    .then(result => {
+        return {
+            trans: "success",  
+            repCus: result.rows  
+    }
+    })
+    .catch(err =>{
+        return{
+            trans: "fail",
+            msg: `${err.message}`
+        }
+    })
+
+};
+
 
 
 const findCustomer = (customer) => {
@@ -120,7 +133,7 @@ const findCustomer = (customer) => {
 };
 
 
-
+module.exports.reportCustomer = reportCustomer;
 module.exports.findCustomer = findCustomer;
 module.exports.insertCustomer = insertCustomer;
 module.exports.getTotalRecords = getTotalRecords;

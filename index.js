@@ -230,7 +230,7 @@ app.post("/delete/:id", async (req, res) => {
 
 //Get /report
 app.get("/reports", async (req, res) => {
-  const totRecs = await dblib.getTotalRecords();
+  const repCus = await dblib.reportCustomer();
 
   const customers = {
     cusid: "",
@@ -243,7 +243,7 @@ app.get("/reports", async (req, res) => {
 
   res.render("reports", {
     type: "get",
-    totRecs: totRecs.totRecords,
+    repCus: repCus.repCus,
     customer: customers
   });
 });
@@ -251,23 +251,23 @@ app.get("/reports", async (req, res) => {
 //POST /report
 app.post("/reports", async (req, res) => {
 
-  const totRecs = await dblib.getTotalRecords();
-
-  dblib.findCustomer(req.body)
+  const repCus = await dblib.reportCustomer();
+  console.log(repCus);
+  dblib.reportCustomer(req.body)
     .then(result => {
       res.render("reports", {
-        type: "post",
-        totRecs: totRecs.totRecords,
+        type: "POST",
+        repCus: repCus.rowCount,
         result: result,
-        customer: req.body
+        customer: repCus
       })
     })
     .catch(err => {
       res.render("reports", {
-        type: "post",
-        totRecs: totRecs.totRecords,
+        type: "POST",
+        repCus: repCus.rowCount,
         result: `Unexpected Error: ${err.message}`,
-        customer: req.body
+        customer: repCus
       });
     });
 
@@ -306,7 +306,7 @@ app.post("/import", upload.single('filename'), (req, res) => {
 
   lines.forEach(line => {
     console.log(line);
-    const customer = line.split(",");
+    const customer = line.split(/[$]/);
     
     console.log(customer);
     const sql = "INSERT INTO customer(cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
