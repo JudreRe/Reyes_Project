@@ -1,18 +1,46 @@
 <label>Select Report</label><br>
 <form action="/reports" method="POST">
     <select autofocus name="reports" id="reports">
-        <option value="<%= repCus%>">All Customers- Sorted by Customer Last Name, First Name</option>
-        <option value="<%=  %>">All Customers- Sorted by Current Total Sales Decreasing</option>
-        <option value="<%=  %>">Promotional Giveaway (Not Repeating)</option>
+        <option value= "1" selected>All Customers- Sorted by Customer Last Name, First Name</option>
+        <option value= "2" selected>All Customers- Sorted by Current Total Sales Decreasing</option>
+        <option value= "3" selected>Three Random Customers - Promotional Giveaway (Not Repeating)</option>
     </select>
     <br>
-    <form style="padding-top: 30px;">
-        <input class="btn btn-info" type="submit" value="Run Report" id = "reports">
+    <form>
+        <input class="btn btn-info" type="submit" value="Run Report" id="reports">
     </form>
 </form>
 
 <% if (type === "POST") { %>
-    <% if (repCus === 1) { %>
+
+<% if (value = 1) { %>
+<table>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>State</th>
+                <th>Sales YTD</th>
+                <th>Prev Years Sales</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% cusReport.forEach(customers => { %>
+            <tr>
+                <td><%= customers.cusid %></td>
+                <td><%= customers.cusfname %></td>
+                <td><%= customers.cuslname %></td>
+                <td><%= customers.cusstate %></td>
+                <td><%= customers.cussalesytd %></td>
+                <td><%= customers.cussalesprev %></td>
+            </tr>
+            <% }); %>
+        </tbody>
+
+
+        <% } else if (value = 2) { %>
         <table>
             <table class="table table-hover">
                 <thead>
@@ -26,18 +54,50 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% result.result.forEach(customer => { %>
+                    <% cusSales.forEach(customers => { %>
                     <tr>
-                        <td><%= customer.cusid %></td>
-                        <td><%= customer.cusfname %></td>
-                        <td><%= customer.cuslname %></td>
-                        <td><%= customer.cusstate %></td>
-                        <td><%= customer.cussalesytd %></td>
-                        <td><%= customer.cussalesprev %></td>
+                        <td><%= customers.cusid %></td>
+                        <td><%= customers.cusfname %></td>
+                        <td><%= customers.cuslname %></td>
+                        <td><%= customers.cusstate %></td>
+                        <td><%= customers.cussalesytd %></td>
+                        <td><%= customers.cussalesprev %></td>
                     </tr>
                     <% }); %>
                 </tbody>
-        
+
             </table>
-            <% } %>
-            <% } %>
+            <% } else { %>
+            <table>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>State</th>
+                            <th>Sales YTD</th>
+                            <th>Prev Years Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% cusRandom.forEach(customers => { %>
+                        <tr>
+                            <td><%= customers.cusid %></td>
+                            <td><%= customers.cusfname %></td>
+                            <td><%= customers.cuslname %></td>
+                            <td><%= customers.cusstate %></td>
+                            <td><%= customers.cussalesytd %></td>
+                            <td><%= customers.cussalesprev %></td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+
+                </table>
+                <% } %>
+                <% } %>
+
+
+
+
+           

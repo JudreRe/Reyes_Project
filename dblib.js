@@ -39,13 +39,13 @@ const insertCustomer = (customer) => {
         .then(res => {
             return {
                 trans: "success", 
-                msg: `cus id ${params[0]} successfully inserted`
+                msg: `customer id ${params[0]} successfully inserted`
             };
         })
         .catch(err => {
             return {
                 trans: "fail", 
-                msg: `Error on insert of car id ${params[0]}.  ${err.message}`
+                msg: `Error on insert of customer id ${params[0]}.  ${err.message}`
             };
         });
 };
@@ -56,10 +56,10 @@ const reportCustomer = () => {
     const sql = "SELECT * FROM customer ORDER BY cuslname asc";
 
     return pool.query(sql)
-    .then(result => {
+    .then(report => {
         return {
             trans: "success",  
-            repCus: result.rows  
+            repCus: report.rows  
     }
     })
     .catch(err =>{
@@ -71,7 +71,46 @@ const reportCustomer = () => {
 
 };
 
+const reportSales = () => {
 
+ 
+    const sql = "SELECT * FROM customer ORDER BY cussalesytd desc";
+
+    return pool.query(sql)
+    .then(report => {
+        return {
+            trans: "success",  
+            repSal: report.rows  
+    }
+    })
+    .catch(err =>{
+        return{
+            trans: "fail",
+            msg: `${err.message}`
+        }
+    })
+
+};
+
+const reportRandom = () => {
+
+    const sql = "SELECT * FROM customer ORDER BY RANDOM() LIMIT 3";
+
+    return pool.query(sql)
+    .then(report => {
+        return {
+            trans: "success",
+            repRan: report.rows
+        }
+
+    })
+    .catch(err =>{
+        return {
+            trans:"fail",
+            msg: `${err.message}`
+        }
+    })
+};
 
 const findCustomer = (customer) => {
     
@@ -132,7 +171,8 @@ const findCustomer = (customer) => {
         });
 };
 
-
+module.exports.reportRandom = reportRandom;
+module.exports.reportSales = reportSales;
 module.exports.reportCustomer = reportCustomer;
 module.exports.findCustomer = findCustomer;
 module.exports.insertCustomer = insertCustomer;

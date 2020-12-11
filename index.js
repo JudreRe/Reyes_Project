@@ -30,11 +30,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.listen(3000, () => {
-//   {
-//     console.log("Server started (http://localhost:3000/) !");
-//   }
-// });
 
 app.listen(process.env.PORT || 3000, function(){
   console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
@@ -230,50 +225,51 @@ app.post("/delete/:id", async (req, res) => {
 });
 
 
-
 //Get /report
 app.get("/reports", async (req, res) => {
-  const repCus = await dblib.reportCustomer();
 
-  const customers = {
-    cusid: "",
-    cusfname: "",
-    cuslname: "",
-    cusstate: "",
-    cussalesytd: "",
-    cussalesprev: ""
-  };
+  const reports = req.body;
 
   res.render("reports", {
     type: "get",
-    repCus: repCus.repCus,
-    customer: customers
+    model: reports
   });
 });
 
 //POST /report
 app.post("/reports", async (req, res) => {
 
-  const repCus = await dblib.reportCustomer();
-  console.log(repCus);
-  dblib.reportCustomer(req.body)
-    .then(result => {
-      res.render("reports", {
-        type: "POST",
-        repCus: repCus.rowCount,
-        result: result,
-        customer: repCus
-      })
-    })
-    .catch(err => {
-      res.render("reports", {
-        type: "POST",
-        repCus: repCus.rowCount,
-        result: `Unexpected Error: ${err.message}`,
-        customer: repCus
-      });
-    });
+  const cusReport = await dblib.reportCustomer();
+  const cusSales = await dblib.reportSales();
+  const cusRandom = await dblib.reportRandom();
 
+  
+
+
+ try {
+  console.log(cusSales);
+  res.render("reports", {
+    type: "POST",
+    cusReport: cusReport.repCus,
+    cusSales: cusSales.repSal,
+    cusRandom: cusRandom.repRan,
+    
+  
+  });
+ } catch {
+
+  res.render("reports", {
+    type: "POST",
+    cusReport: err.message,
+    cusSales: err.message,
+    cusRandom: err.message
+  
+
+  });
+ 
+  console.log(err.message);
+
+ }
 });
 
 // GET /import
