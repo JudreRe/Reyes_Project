@@ -225,7 +225,7 @@ app.post("/delete/:id", async (req, res) => {
 });
 
 
-//Get /report
+//Get /reports
 app.get("/reports", async (req, res) => {
 
   const reports = req.body;
@@ -236,35 +236,57 @@ app.get("/reports", async (req, res) => {
   });
 });
 
-//POST /report
+//POST /reports
 app.post("/reports", async (req, res) => {
+console.log(req.body);
+var report;
+var trans;
 
-  const cusReport = await dblib.reportCustomer();
-  const cusSales = await dblib.reportSales();
-  const cusRandom = await dblib.reportRandom();
+try {
 
+  if (req.body.reports === "1"){
+
+    const cusReport = await dblib.reportCustomer();
+    report = cusReport.repCus;
+    trans = cusReport.trans;
+
+  } else if (req.body.reports === "2") {
+
+    const cusSales = await dblib.reportSales();
+
+    if (cusSales.trans === "success") {
+      report = cusSales.repSal;
+      trans = cusSales.trans;
+
+    } else {
+
+      report = cusSales.msg;
+      trans = cusSales.trans;
+      console.log("Error!", report);
+
+    }
+  } else {
+
+    const cusRandom= await dblib.reportRandom();
+    report = cusRandom.repRan;
+    trans = cusRandom.trans;
+  }
   
-
-
- try {
-  console.log(cusSales);
+ 
   res.render("reports", {
     type: "POST",
-    cusReport: cusReport.repCus,
-    cusSales: cusSales.repSal,
-    cusRandom: cusRandom.repRan,
-    
-  
+    report: report,
+    trans: trans,
+    value: req.body.reports
   });
- } catch {
+ } catch (err) {
 
   res.render("reports", {
     type: "POST",
-    cusReport: err.message,
-    cusSales: err.message,
-    cusRandom: err.message
+    trans: "fail",
+    report: err.message,
+    value: req.body.reports
   
-
   });
  
   console.log(err.message);
@@ -305,7 +327,7 @@ app.post("/import", upload.single('filename'), (req, res) => {
 
   lines.forEach(line => {
     console.log(line);
-    const customer = line.split(/[$]/);
+    const customer = line.split(",");
     
     console.log(customer);
     const sql = "INSERT INTO customer(cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
@@ -348,7 +370,7 @@ app.get("/export", async (req, res) => {
 
 // POST /export
 app.post("/export", async (req, res) => {
-  const sql = "SELECT * FROM customer ORDER BY cusid";
+  const sql = "SELECT cusid, cusfname, cuslname, cusstate, cussalesytd::numeric, cussalesprev::numeric FROM customer";
   pool.query(sql, [], (err, result) => {
     var message = "";
     if (err) {
