@@ -335,49 +335,31 @@ app.get("/import", async (req, res) => {
 
 // POST /import
 app.post("/import", upload.single('filename'), async (req, res) => {
-var numInserted = 0;
-var numFailed = 0;
-var errorMessage = "";
-var x;
-
-
-const buffer = req.file.buffer;
-const lines = buffer.toString().split(/\r?\n/);
-
-for (line of lines) {
+  if (!req.file || Object.keys(req.file).length === 0) {
+    message = "Error: Import file not uploaded";
+    return res.send(message);
+  };
   
-  const customer = line.split(",");
-  
-  const sql = "INSERT INTO customer(cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
-  console.log(numFailed);
-  
+  const buffer = req.file.buffer;
+  const lines = buffer.toString().split(/\r?\n/);
 
-  await pool.query(sql, customer, (err, result) => {
-
-    const result = dblib.insertProduct(line);
-
-    if (result.trans === "success") {
-      
-      numInserted++;
-
-      console.log(numInserted);
-     
-    } else {
-       
-      numFailed++;
-      errorMessage += `${result.msg} \r\n`
-     
- 
-    }
+  lines.forEach(line => {
+    console.log(line);
+    const customer = line.split(",");
     
-   
+    console.log(customer);
+    const sql = "INSERT INTO customer(cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
+    pool.query(sql, customer, (err, result) => {
+      if (err) {
+        console.log(`Insert Error.  Error message: ${err.message}`);
+      } else {
+        console.log(`Inserted successfully`);
+      }
+    });
   });
-};
-message = `Processing Complete - Processed ${lines.length} Records`;
-
-res.send(message);
+  message = `Processing Complete - Processed ${lines.length} records`;
+  res.send(message);
 });
-
 
 
 
