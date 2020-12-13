@@ -228,11 +228,14 @@ app.post("/delete/:id", async (req, res) => {
 //Get /reports
 app.get("/reports", async (req, res) => {
 
-  const reports = req.body;
+  const reports = req.body.value;
 
   res.render("reports", {
     type: "get",
-    model: reports
+    model: reports,
+    cust: "",
+    sale: "",
+    ran: ""
   });
 });
 
@@ -241,6 +244,11 @@ app.post("/reports", async (req, res) => {
 console.log(req.body);
 var report;
 var trans;
+var x;
+var y;
+var z;
+
+const model = req.body;
 
 try {
 
@@ -249,6 +257,7 @@ try {
     const cusReport = await dblib.reportCustomer();
     report = cusReport.repCus;
     trans = cusReport.trans;
+    y = "selected";
 
   } else if (req.body.reports === "2") {
 
@@ -257,12 +266,14 @@ try {
     if (cusSales.trans === "success") {
       report = cusSales.repSal;
       trans = cusSales.trans;
+      x = "selected";
 
     } else {
 
       report = cusSales.msg;
       trans = cusSales.trans;
       console.log("Error!", report);
+      z = "selected"
 
     }
   } else {
@@ -270,14 +281,20 @@ try {
     const cusRandom= await dblib.reportRandom();
     report = cusRandom.repRan;
     trans = cusRandom.trans;
+
+    z = "selected"
   }
   
- 
+ console.log(x,y,z);
   res.render("reports", {
     type: "POST",
     report: report,
     trans: trans,
-    value: req.body.reports
+    model: model,
+    value: req.body.reports,
+    cust: y,
+    sale: x,
+    ran: z
   });
  } catch (err) {
 
@@ -285,6 +302,7 @@ try {
     type: "POST",
     trans: "fail",
     report: err.message,
+    model: model,
     value: req.body.reports
   
   });
@@ -316,32 +334,50 @@ app.get("/import", async (req, res) => {
 });
 
 // POST /import
-app.post("/import", upload.single('filename'), (req, res) => {
-  if (!req.file || Object.keys(req.file).length === 0) {
-    message = "Error: Import file not uploaded";
-    return res.send(message);
-  };
-  //Read file line by line, inserting records
-  const buffer = req.file.buffer;
-  const lines = buffer.toString().split(/\r?\n/);
+app.post("/import", upload.single('filename'), async (req, res) => {
+var numInserted = 0;
+var numFailed = 0;
+var errorMessage = "";
+var x;
 
-  lines.forEach(line => {
-    console.log(line);
-    const customer = line.split(",");
+
+const buffer = req.file.buffer;
+const lines = buffer.toString().split(/\r?\n/);
+
+for (line of lines) {
+  
+  const customer = line.split(",");
+  
+  const sql = "INSERT INTO customer(cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
+  console.log(numFailed);
+  
+
+  await pool.query(sql, customer, (err, result) => {
+
+    const result = dblib.insertProduct(line);
+
+    if (result.trans === "success") {
+      
+      numInserted++;
+
+      console.log(numInserted);
+     
+    } else {
+       
+      numFailed++;
+      errorMessage += `${result.msg} \r\n`
+     
+ 
+    }
     
-    console.log(customer);
-    const sql = "INSERT INTO customer(cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
-    pool.query(sql, customer, (err, result) => {
-      if (err) {
-        console.log(`Insert Error.  Error message: ${err.message}`);
-      } else {
-        console.log(`Inserted successfully`);
-      }
-    });
+   
   });
-  message = `Processing Complete - Processed ${lines.length} records`;
-  res.send(message);
+};
+message = `Processing Complete - Processed ${lines.length} Records`;
+
+res.send(message);
 });
+
 
 
 
@@ -349,6 +385,7 @@ app.post("/import", upload.single('filename'), (req, res) => {
 // GET /export
 app.get("/export", async (req, res) => {
   const totRecs = await dblib.getTotalRecords();
+  var message = "";
 
   const customers = {
     cusid: "",
@@ -358,7 +395,7 @@ app.get("/export", async (req, res) => {
     cussalesytd: "",
     cussalesprev: ""
   };
-  var message = "";
+
   res.render("export", {
     type: "get",
     message: message,
@@ -369,13 +406,13 @@ app.get("/export", async (req, res) => {
 });
 
 // POST /export
-app.post("/export", async (req, res) => {
+app.post("/export",  (req, res) => {
   const sql = "SELECT cusid, cusfname, cuslname, cusstate, cussalesytd::numeric, cussalesprev::numeric FROM customer";
   pool.query(sql, [], (err, result) => {
     var message = "";
     if (err) {
       message = `Error - ${err.message}`;
-      res.render("output", { message: message })
+      res.render("export", { message: message })
     } else {
       var output = "";
       result.rows.forEach(customer => {

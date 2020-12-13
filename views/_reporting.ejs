@@ -1,9 +1,9 @@
 <label>Select Report</label><br>
 <form action="/reports" method="POST">
     <select autofocus name="reports" id="reports">
-        <option value= "1" >All Customers- Sorted by Customer Last Name, First Name</option>
-        <option value= "2" >All Customers- Sorted by Current Total Sales Decreasing</option>
-        <option value= "3" >Three Random Customers - Promotional Giveaway (Not Repeating)</option>
+        <option <%= cust %> value = "1"  >All Customers- Sorted by Customer Last Name, First Name</option>
+        <option <%= sale %> value = "2"  >All Customers- Sorted by Current Total Sales Decreasing</option>
+        <option <%= ran %> value = "3"  >Three Random Customers - Promotional Giveaway (Not Repeating)</option>
     </select>
     <br>
     
