@@ -112,6 +112,26 @@ const reportRandom = () => {
     })
 };
 
+const importCustomer = (params) => {
+
+    const sql = "INSERT INTO customer(cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
+   
+    return pool.query(sql, params)
+
+        .then(res => {
+            return {
+                trans: "success", 
+                result: res.rows
+            };
+        })
+        .catch(err => {
+            return {
+                trans: "fail", 
+                msg: `${err.message}`
+            };
+        });
+}
+
 const findCustomer = (customer) => {
     
 
@@ -171,6 +191,7 @@ const findCustomer = (customer) => {
         });
 };
 
+module.exports.importCustomer = importCustomer;
 module.exports.reportRandom = reportRandom;
 module.exports.reportSales = reportSales;
 module.exports.reportCustomer = reportCustomer;

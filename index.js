@@ -5,6 +5,7 @@ const path = require("path");
 const multer = require("multer");
 const upload = multer();
 const { Pool } = require('pg');
+const { response } = require("express");
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -31,7 +32,7 @@ app.use((req, res, next) => {
 });
 
 
-app.listen(process.env.PORT || 3000, function(){
+app.listen(process.env.PORT || 3000, function () {
   console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
 });
 
@@ -98,8 +99,10 @@ app.post("/manage", async (req, res) => {
 // GET /create
 app.get("/create", (req, res) => {
 
-  res.render("create", { model: {},
-  type: "get" });
+  res.render("create", {
+    model: {},
+    type: "get"
+  });
 });
 
 
@@ -126,7 +129,7 @@ app.post("/create", async (req, res) => {
     res.render("create", {
       model: show,
       resultNew: err.message,
-      type:"POST"
+      type: "POST"
     });
   }
 });
@@ -154,11 +157,11 @@ app.post("/edit/:id", async (req, res) => {
   const model = [req.body.cusfname, req.body.cuslname, req.body.cusstate, req.body.cussalesytd, req.body.cussalesprev, id];
   const show = req.body;
   console.log("The show is", show);
- 
+
   const sql = "UPDATE customer SET cusfname = $1, cuslname = $2, cusstate = $3, cussalesytd = $4, cussalesprev = $5 WHERE (cusid = $6)";
-    
+
   try {
- 
+
     const resultEdit = await pool.query(sql, model);
 
     res.render("edit", {
@@ -241,75 +244,74 @@ app.get("/reports", async (req, res) => {
 
 //POST /reports
 app.post("/reports", async (req, res) => {
-console.log(req.body);
-var report;
-var trans;
-var x;
-var y;
-var z;
+  console.log(req.body);
+  var report;
+  var trans;
+  var x;
+  var y;
+  var z;
 
-const model = req.body;
+  const model = req.body;
 
-try {
+  try {
 
-  if (req.body.reports === "1"){
+    if (req.body.reports === "1") {
 
-    const cusReport = await dblib.reportCustomer();
-    report = cusReport.repCus;
-    trans = cusReport.trans;
-    y = "selected";
+      const cusReport = await dblib.reportCustomer();
+      report = cusReport.repCus;
+      trans = cusReport.trans;
+      y = "selected";
 
-  } else if (req.body.reports === "2") {
+    } else if (req.body.reports === "2") {
 
-    const cusSales = await dblib.reportSales();
+      const cusSales = await dblib.reportSales();
 
-    if (cusSales.trans === "success") {
-      report = cusSales.repSal;
-      trans = cusSales.trans;
-      x = "selected";
+      if (cusSales.trans === "success") {
+        report = cusSales.repSal;
+        trans = cusSales.trans;
+        x = "selected";
 
+      } else {
+
+        report = cusSales.msg;
+        trans = cusSales.trans;
+        console.log("Error!", report);
+        z = "selected"
+
+      }
     } else {
 
-      report = cusSales.msg;
-      trans = cusSales.trans;
-      console.log("Error!", report);
+      const cusRandom = await dblib.reportRandom();
+      report = cusRandom.repRan;
+      trans = cusRandom.trans;
       z = "selected"
-
     }
-  } else {
 
-    const cusRandom= await dblib.reportRandom();
-    report = cusRandom.repRan;
-    trans = cusRandom.trans;
+    console.log(x, y, z);
+    res.render("reports", {
+      type: "POST",
+      report: report,
+      trans: trans,
+      model: model,
+      value: req.body.reports,
+      cust: y,
+      sale: x,
+      ran: z
+    });
+  } catch (err) {
 
-    z = "selected"
+    res.render("reports", {
+      type: "POST",
+      trans: "fail",
+      report: err.message,
+      model: model,
+      value: req.body.reports
+
+    });
+
+    console.log(err.message);
+
   }
-  
- console.log(x,y,z);
-  res.render("reports", {
-    type: "POST",
-    report: report,
-    trans: trans,
-    model: model,
-    value: req.body.reports,
-    cust: y,
-    sale: x,
-    ran: z
-  });
- } catch (err) {
-
-  res.render("reports", {
-    type: "POST",
-    trans: "fail",
-    report: err.message,
-    model: model,
-    value: req.body.reports
-  
-  });
- 
-  console.log(err.message);
-
- }
 });
 
 // GET /import
@@ -335,31 +337,64 @@ app.get("/import", async (req, res) => {
 
 // POST /import
 app.post("/import", upload.single('filename'), async (req, res) => {
-  if (!req.file || Object.keys(req.file).length === 0) {
-    message = "Error: Import file not uploaded";
-    return res.send(message);
-  };
-  
-  const buffer = req.file.buffer;
-  const lines = buffer.toString().split(/\r?\n/);
 
-  lines.forEach(line => {
-    console.log(line);
-    const customer = line.split(",");
-    
-    console.log(customer);
-    const sql = "INSERT INTO customer(cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
-    pool.query(sql, customer, (err, result) => {
-      if (err) {
-        console.log(`Insert Error.  Error message: ${err.message}`);
+  (async () => {
+    var numInserted = 0;
+    var numFailed = 0;
+    var errorMessage = "";
+    const buffer = req.file.buffer;
+    const lines = buffer.toString().split(/\r?\n/);
+
+
+
+    for (line of lines) {
+      
+      const customer = line.split(",");
+      console.log(customer);
+      
+      console.log("Wait for Result")
+
+      const result = await dblib.importCustomer(customer);
+
+      if (result.trans === "success") {
+
+        numInserted++;
+
       } else {
-        console.log(`Inserted successfully`);
-      }
-    });
-  });
-  message = `Processing Complete - Processed ${lines.length} records`;
-  res.send(message);
+
+        numFailed++;
+
+        errorMessage += `${result.msg} \r\n`;
+      };
+    };
+
+    console.log("Import Summary");
+    console.log(`Records processed: ${numInserted + numFailed}`);
+    console.log(`Records successfully inserted: ${numInserted}`);
+    console.log(`Records with insertion errors: ${numFailed}`);
+
+    if (numFailed > 0) {
+
+      console.log("Error Details:");
+
+      console.log(errorMessage);
+    };
+
+    const totRecs = await dblib.getTotalRecords();
+
+    res.render("import", {
+      type: "POST",
+      totRecs: totRecs.totRecords,
+      numFailed: numFailed,
+      numInserted: numInserted,
+      errorMessage: errorMessage
+    })
+
+  })()
+
 });
+
+
 
 
 
@@ -388,7 +423,7 @@ app.get("/export", async (req, res) => {
 });
 
 // POST /export
-app.post("/export",  (req, res) => {
+app.post("/export", (req, res) => {
   const sql = "SELECT cusid, cusfname, cuslname, cusstate, cussalesytd::numeric, cussalesprev::numeric FROM customer";
   pool.query(sql, [], (err, result) => {
     var message = "";
