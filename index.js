@@ -286,7 +286,7 @@ app.post("/reports", async (req, res) => {
       trans = cusRandom.trans;
       z = "selected"
     }
-
+    //see what returns
     console.log(x, y, z);
     res.render("reports", {
       type: "POST",
@@ -298,6 +298,7 @@ app.post("/reports", async (req, res) => {
       sale: x,
       ran: z
     });
+    
   } catch (err) {
 
     res.render("reports", {

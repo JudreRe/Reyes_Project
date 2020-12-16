@@ -152,7 +152,7 @@ const findCustomer = (customer) => {
     };
     if (customer.cuslname !== "") {
         params.push(`${customer.cuslname}%`);
-        sql += ` AND UPPER(cuslastname) LIKE UPPER($${i})`;
+        sql += ` AND UPPER(cuslname) LIKE UPPER($${i})`;
         i++;
     };
     if (customer.cusstate !== "") {
